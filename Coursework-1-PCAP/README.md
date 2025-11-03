@@ -32,6 +32,5 @@ As detailed in the full report, the investigation successfully answered the thre
 
 ### 📜 Full Incident Report
 
-*(This is where you would add your final PDF. Make sure to upload it to this directory.)*
 
 [**Download the Full PDF Report: `CW1_Report.pdf`**](./CW1_Report.pdf)
