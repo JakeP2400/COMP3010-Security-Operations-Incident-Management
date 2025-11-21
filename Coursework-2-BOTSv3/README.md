@@ -10,3 +10,6 @@ As detailed in the full report, the investigation successfully answered the thre
     * Using the command **index="botsv3" earliest=0 sourcetype="aws:cloudtrail"**, looking at the **userIdentity.userName88 field, we can see that the users who accessed an AWS service were **bstoll,btun,splunk_access,web_admin**. This is evidenced in (./Screenshots/Q1).
     * An alternative method to clicking the field would be, to use the command **index=botsv3 sourcetype="aws:cloudtrail"
     | stats count by userIdentity.userName** and to then view the "Statistics" tab which would show the four IAM users. In this case confirming **bstoll,btun,splunk_access,web_admin**. This is evidenced in (./Screenshots/Q1).
+
+2. **What field would you use to alert that AWS API activity has occurred without MFA?**
+    * Using the command **fieldsummary** and **search field**, I have been able to find two fields which contain MFA, and after viewing the values of both against the event types, by analysing using the statistics tab, it shows that "additionalEventData.MFAUsed" has only been using for an eventType of "AwsConsoleSignIn" whereas **userIdentity.sessionContext.attributes.mfaAuthenticated** has beeen used for aan eventType of **AwsApiCall** which demonstrates the API activity.
