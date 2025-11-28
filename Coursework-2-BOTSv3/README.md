@@ -13,3 +13,6 @@ As detailed in the full report, the investigation successfully answered the thre
 
 2. **What field would you use to alert that AWS API activity has occurred without MFA?**
     * Using the command **fieldsummary** and **search field**, I have been able to find two fields which contain MFA, and after viewing the values of both against the event types, by analysing using the statistics tab, it shows that "additionalEventData.MFAUsed" has only been using for an eventType of "AwsConsoleSignIn" whereas **userIdentity.sessionContext.attributes.mfaAuthenticated** has beeen used for aan eventType of **AwsApiCall** which demonstrates the API activity.
+
+3. **What is the processor number used on the web servers?**
+    * Using the command **index="botsv3" sourcetype="hardware"**, we can view that the events output as a result of this are 3 Events which contain hardware information. By analysing these, the value of **CPU_TYPE** is **Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz**, and when put into the form requested is **E5-2676**.
