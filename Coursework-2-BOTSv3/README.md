@@ -19,3 +19,6 @@ As detailed in the full report, the investigation successfully answered the thre
 
 4. **Bud accidentally makes an S3 bucket publically accessible. What is the eventID of the API call that enabled public access?**
     * Using the command **index="botsv3" sourcetype="aws:cloudtrail" eventName=PutBucketAcl**, we can see the events of "PutBucketAcl", this event sets the ACL (Access Control List) of an existing bucket. By analysing both events, we can see the ACL (Access Control List) of both is [""], meaning it is publically available. Therefore the earlier event caused the S3 bucket to be publically available, which is the eventID **ab45689d-69cd-41e7-8705-5350402cf7ac**.
+
+5. **What is Bud's username?**"
+    * Using the event from the previous question, we can find the field of "userName" in this case the content is "bstoll", indicating that user who made the S3 bucket publically available is bstoll, and as we know this is Bud, **Buds username is bstoll**.
