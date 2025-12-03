@@ -22,3 +22,6 @@ As detailed in the full report, the investigation successfully answered the thre
 
 5. **What is Bud's username?**"
     * Using the event from the previous question, we can find the field of "userName" in this case the content is "bstoll", indicating that user who made the S3 bucket publically available is bstoll, and as we know this is Bud, **Buds username is bstoll**.
+    
+6. **What is the name of the S3 bucket that was made publically accessible?**
+    * Also using the event from question 4, we can find within the requestParameters, the field of "bucketName" is available, in this case it is "frothlywebcode". Based on this we can see that the asnwer is **frothlywebcode**.
