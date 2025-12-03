@@ -25,3 +25,7 @@ As detailed in the full report, the investigation successfully answered the thre
     
 6. **What is the name of the S3 bucket that was made publically accessible?**
     * Also using the event from question 4, we can find within the requestParameters, the field of "bucketName" is available, in this case it is "frothlywebcode". Based on this we can see that the asnwer is **frothlywebcode**.
+
+7. **What is the name of the text file that was successfully uploaded into the S3 bucket while it was publically available?**
+
+    * By using the sourcetype of "aws:s3:accesslogs", and using a time range of all time, we can see that a lot of events are available, however as we know this is a text document, we can add the term "txt" to our search for a final query of "index="botsv3" sourcetype=aws:S3:accesslogs txt", which gives us three final events, all within 1 minute of each other, and showing the same txt file "**OPEN_BUCKET_PLEASE_FIX.txt**", with one of these events being a PUT request, which for an S3 bucket is the operation used to add an object to a bucket.
