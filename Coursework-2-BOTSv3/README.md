@@ -2,6 +2,8 @@
 
 This project has involved using Splunk to aanalyse the BOTSv3 dataset (Boss of the SOC). The full report will be available once completed with a video walkthrough.
 
+#### DLE quiz completed, 100% achieved.
+
 ### Summary of My Findings
 
 As detailed in the full report, the investigation successfully answered the three key questions:
@@ -27,5 +29,9 @@ As detailed in the full report, the investigation successfully answered the thre
     * Also using the event from question 4, we can find within the requestParameters, the field of "bucketName" is available, in this case it is "frothlywebcode". Based on this we can see that the asnwer is **frothlywebcode**.
 
 7. **What is the name of the text file that was successfully uploaded into the S3 bucket while it was publically available?**
-
     * By using the sourcetype of "aws:s3:accesslogs", and using a time range of all time, we can see that a lot of events are available, however as we know this is a text document, we can add the term "txt" to our search for a final query of "index="botsv3" sourcetype=aws:S3:accesslogs txt", which gives us three final events, all within 1 minute of each other, and showing the same txt file "**OPEN_BUCKET_PLEASE_FIX.txt**", with one of these events being a PUT request, which for an S3 bucket is the operation used to add an object to a bucket.
+
+8. **What is the FQDN of the endpoint that is running the different Windows operating system edition than the others?**
+    * To start this, I used the sourcetype "winhostmon" and **| search "Microsoft Windows"**. This allowed me to find any events relating to the Operating System as the question requires knowing which operating system is the odd one out from the others.
+    * From this point, I then used the Statistics view within Splunk and the command **index="botsv3" sourcetype="winhostmon" | stats values(OS) by host**. This allows for me to look at which Operating System is used by which host, showing me that the odd one out is **Microsoft Windows 10 Enterprise** being used on the host **BSTOLL-L**.
+    * From here I was able to continue investigating to find the FQDN (Fully Qualified Domain Name). Following this, I completed a search with the following command "index="botsv3" sourcetype=* host="BSTOLL-L" | search domain AND BSTOLL-L". By doing this, I am able to search for all sourcetypes, where the host is "BSTOLL-L". Following this I use the search to get events which contain the domain and BSTOLL-L. This results in a **WinEventLog:Security** event which contains the ComputerName references to the Windows Event Log, which will be the FQDN. And in this scenario, the FQDN is **BSTOLL-L.froth.ly**.
