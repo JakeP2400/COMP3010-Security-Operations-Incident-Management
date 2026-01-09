@@ -2,6 +2,8 @@
 **Context:** Splunk-managed Security Operations Centre (SOC)
 **Subject:** S3 Bucket Public Exposure & Endpoint Compliance Analysis
 
+YouTube Link - [https://youtu.be/4pSGyYi1H7w]
+
 ---
 
 ## Executive Summary
@@ -44,6 +46,7 @@ The Splunk instance was deployed on **Ubuntu 24.04.3 LTS** as a **single-instanc
 3. **Verification:** Validated data availability using the SPL command:
    `index=botsv3 earliest=0`
 
+
 ---
 
 ## Technical Analysis (Guided Questions)
@@ -53,19 +56,20 @@ The Splunk instance was deployed on **Ubuntu 24.04.3 LTS** as a **single-instanc
 **Analysis:** Using the `aws:cloudtrail` sourcetype, I analyzed the `userIdentity.userName` field.
 * **SPL:** `index=botsv3 sourcetype="aws:cloudtrail" | stats count by userIdentity.userName`
 * **Result:** The four IAM users are `bstoll`, `btun`, `splunk_access`, and `web_admin`.
-
+![Users](Screenshots\Q1\Q1-Stats_view.png)
 ### 2. Multi-factor Authentication (MFA) Compliance
 **Question:** What field identifies AWS API activity without MFA?
 **Analysis:** By filtering `eventType` against MFA-related fields, I identified the field responsible for tracking API authentication status.
 * **Field:** `userIdentity.sessionContext.attributed.mfaAuthenticated`
 * **Observation:** When this value is `false`, API activity occurred without MFA.
-
+![MFA](Screenshots/Q2/MFA_types_bool.png)
 ### 3. Asset Identification and Inventory
 **Question:** What is the processor number used on the web servers?
 **Analysis:** Investigating the `winhostmon` sourcetype for hardware events.
 * **Value Found:** `CPU_TYP` = `Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz`.
 * **Processor Number:** `E5-2676`.
 
+![Hardware](Screenshots/Q3/hardware.png)
 ---
 
 ## Cloud Data Breach (S3 Bucket Breach)
@@ -75,21 +79,28 @@ The Splunk instance was deployed on **Ubuntu 24.04.3 LTS** as a **single-instanc
 **Analysis:** S3 uses Access Control Lists (ACLs). I searched for the `PutBucketAcl` eventName.
 * **EventID:** `ab45689d-69cd-41e7-8705-5350402cf7ac`.
 
+![EventID](Screenshots/Q4/EventID-JSON.png)
+
 ### 5. Responsible User
 **Question:** What is Bud's username?
 **Analysis:** The `userName` field within the `PutBucketAcl` event reveals the culprit.
 * **User:** `bstoll`.
+
+![Buds Username](Screenshots/Q5/Username.png)
 
 ### 6. Compromised Bucket Name
 **Question:** What is the name of the S3 bucket made public?
 **Analysis:** Found in the `requestParameters.bucketName` field.
 * **Bucket Name:** `frothlywebcode`.
 
+![BucketName](Screenshots/Q6/bucketName.png)
 ### 7. Malicious File Upload
 **Question:** What text file was uploaded while the bucket was public?
 **Analysis:** Queried `aws:s3:accesslogs` for "txt" files with a `PUT` operation.
 * **File Name:** `OPEN_BUCKET_PLEASE_FIX.txt`.
 * **Significance:** This confirms a threat actor identified the vulnerability and successfully interacted with the storage.
+
+![PUT Request](Screenshots/Q7/PUT_Request.png)
 
 ---
 
@@ -102,7 +113,23 @@ The Splunk instance was deployed on **Ubuntu 24.04.3 LTS** as a **single-instanc
 * **FQDN Search:** `index="botsv3" host="BSTOLL-L" | search domain AND BSTOLL-L`
 * **Result:** `BSTOLL-L.froth.ly`.
 
+
+![OS By Host](Screenshots/Q8/OS_by_Host.png)
+![Windows 10 Enterprise](Screenshots/Q8/Win10Enterprise.png)
+![FQDN](Screenshots/Q8/FQDN.png)
 ---
+
+## Timeline of Events
+
+| Time        | What happened                                                                 |
+|-------------|--------------------------------------------------------------------------------|
+| 9:10 AM UTC | Bstoll connects on a non-compliant device – “Shadow IT”.                       |
+| 9:35 AM UTC | First Bstoll AWS API login without Multi-factor authentication.                |
+| 1:01 PM UTC | Bstoll makes the S3 bucket publicly available.                                 |
+| 1:03 PM UTC | An external threat actor successfully submits a PUT request to the exposed S3 bucket. |
+| 1:57 PM UTC | The S3 bucket (“frothlywebcode”) is set back to private with the correct ACL.  |
+
+--- 
 
 ## Risk and Damage Assessment
 * **Confidentiality:** The `frothlywebcode` bucket content was exposed; potential for code cloning and vulnerability analysis.
