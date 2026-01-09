@@ -163,3 +163,8 @@ The Frothly S3 bucket incident was caused by a configuration error by user `bsto
 5. [F5 Glossary: FQDN](https://www.f5.com/glossary/fully-qualified-domain-name-fqdn)
 6. [NCSC Guidance: Shadow IT](https://www.ncsc.gov.uk/guidance/shadow-it)
 7. [AWS Config Managed Rules](https://docs.aws.amazon.com/config/latest/developerguide/evaluate-config_use-managed-rules.html)
+
+## External Research Completed
+1. TryHackMe SOC Foundations
+2. TryHackMe Splunk: The Basics
+3. TryHackMe Splunk: Exploring SPL
