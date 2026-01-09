@@ -1,0 +1,37 @@
+# 🛡️ Project 2: Splunk Incident Analysis (BOTSv3 Dataset)
+
+This project has involved using Splunk to aanalyse the BOTSv3 dataset (Boss of the SOC). The full report will be available once completed with a video walkthrough.
+
+#### DLE quiz completed, 100% achieved.
+
+### Summary of My Findings
+
+As detailed in the full report, the investigation successfully answered the three key questions:
+
+1.  **List out the IAM users that accessed an AWS service (successfully or unsuccessfully) in Frothly's AWS environment?**
+    * Using the command **index="botsv3" earliest=0 sourcetype="aws:cloudtrail"**, looking at the **userIdentity.userName** field, we can see that the users who accessed an AWS service were **bstoll,btun,splunk_access,web_admin**. This is evidenced in (./Screenshots/Q1).
+    * An alternative method to clicking the field would be, to use the command **index=botsv3 sourcetype="aws:cloudtrail"
+    | stats count by userIdentity.userName** and to then view the "Statistics" tab which would show the four IAM users. In this case confirming **bstoll,btun,splunk_access,web_admin**. This is evidenced in (./Screenshots/Q1).
+
+2. **What field would you use to alert that AWS API activity has occurred without MFA?**
+    * Using the command **fieldsummary** and **search field**, I have been able to find two fields which contain MFA, and after viewing the values of both against the event types, by analysing using the statistics tab, it shows that "additionalEventData.MFAUsed" has only been using for an eventType of "AwsConsoleSignIn" whereas **userIdentity.sessionContext.attributes.mfaAuthenticated** has beeen used for aan eventType of **AwsApiCall** which demonstrates the API activity.
+
+3. **What is the processor number used on the web servers?**
+    * Using the command **index="botsv3" sourcetype="hardware"**, we can view that the events output as a result of this are 3 Events which contain hardware information. By analysing these, the value of **CPU_TYPE** is **Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz**, and when put into the form requested is **E5-2676**.
+
+4. **Bud accidentally makes an S3 bucket publically accessible. What is the eventID of the API call that enabled public access?**
+    * Using the command **index="botsv3" sourcetype="aws:cloudtrail" eventName=PutBucketAcl**, we can see the events of "PutBucketAcl", this event sets the ACL (Access Control List) of an existing bucket. By analysing both events, we can see the ACL (Access Control List) of both is [""], meaning it is publically available. Therefore the earlier event caused the S3 bucket to be publically available, which is the eventID **ab45689d-69cd-41e7-8705-5350402cf7ac**.
+
+5. **What is Bud's username?**"
+    * Using the event from the previous question, we can find the field of "userName" in this case the content is "bstoll", indicating that user who made the S3 bucket publically available is bstoll, and as we know this is Bud, **Buds username is bstoll**.
+    
+6. **What is the name of the S3 bucket that was made publically accessible?**
+    * Also using the event from question 4, we can find within the requestParameters, the field of "bucketName" is available, in this case it is "frothlywebcode". Based on this we can see that the asnwer is **frothlywebcode**.
+
+7. **What is the name of the text file that was successfully uploaded into the S3 bucket while it was publically available?**
+    * By using the sourcetype of "aws:s3:accesslogs", and using a time range of all time, we can see that a lot of events are available, however as we know this is a text document, we can add the term "txt" to our search for a final query of "index="botsv3" sourcetype=aws:S3:accesslogs txt", which gives us three final events, all within 1 minute of each other, and showing the same txt file "**OPEN_BUCKET_PLEASE_FIX.txt**", with one of these events being a PUT request, which for an S3 bucket is the operation used to add an object to a bucket.
+
+8. **What is the FQDN of the endpoint that is running the different Windows operating system edition than the others?**
+    * To start this, I used the sourcetype "winhostmon" and **| search "Microsoft Windows"**. This allowed me to find any events relating to the Operating System as the question requires knowing which operating system is the odd one out from the others.
+    * From this point, I then used the Statistics view within Splunk and the command **index="botsv3" sourcetype="winhostmon" | stats values(OS) by host**. This allows for me to look at which Operating System is used by which host, showing me that the odd one out is **Microsoft Windows 10 Enterprise** being used on the host **BSTOLL-L**.
+    * From here I was able to continue investigating to find the FQDN (Fully Qualified Domain Name). Following this, I completed a search with the following command "index="botsv3" sourcetype=* host="BSTOLL-L" | search domain AND BSTOLL-L". By doing this, I am able to search for all sourcetypes, where the host is "BSTOLL-L". Following this I use the search to get events which contain the domain and BSTOLL-L. This results in a **WinEventLog:Security** event which contains the ComputerName references to the Windows Event Log, which will be the FQDN. And in this scenario, the FQDN is **BSTOLL-L.froth.ly**.
